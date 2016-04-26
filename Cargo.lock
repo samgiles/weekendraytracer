@@ -1,4 +1,11 @@
 [root]
 name = "1weekendraytracer"
 version = "0.1.0"
+dependencies = [
+ "ppm 0.1.0",
+]
+
+[[package]]
+name = "ppm"
+version = "0.1.0"
 

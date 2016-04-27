@@ -1,5 +1,5 @@
 [root]
-name = "1weekendraytracer"
+name = "weekendraytracer"
 version = "0.1.0"
 dependencies = [
  "ppm 0.1.0",

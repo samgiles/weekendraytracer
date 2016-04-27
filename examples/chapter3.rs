@@ -1,13 +1,12 @@
-extern crate vector;
 extern crate ppm;
-
-mod ray;
+extern crate vector;
+extern crate weekendraytracer;
 
 use std::io;
 use ppm::PPMWriter;
 use vector::Vector4;
 
-use ray::Ray;
+use weekendraytracer::Ray;
 
 fn main() {
     let width  = 200;

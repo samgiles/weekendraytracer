@@ -40,19 +40,3 @@ impl<'a, TWrite: io::Write> PPMWriter<'a, TWrite> {
         Ok(())
     }
 }
-
-#[test]
-fn test_write_ppm() {
-    let writer: Vec<u8> = Vec::new();
-
-    let mut ppm_writer = PPMWriter::new(writer);
-
-    let image_data = &[
-        1.0, 0.0, 0.0,  0.0, 1.0, 0.0,  0.0, 0.0, 1.0,
-        1.0, 1.0, 0.0,  1.0, 1.0, 1.0,  0.0, 0.0, 0.0
-    ];
-
-    ppm_writer.write(image_data, 3, 2).unwrap();
-
-    print!("{:?}", ppm_writer.writer);
-}

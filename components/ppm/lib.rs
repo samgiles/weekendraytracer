@@ -2,18 +2,18 @@ use std::io;
 
 /// A PPM image writer based off of the spec found here:
 /// http://netpbm.sourceforge.net/doc/ppm.html
-pub struct PPMWriter<TWrite> {
-    writer: TWrite
+pub struct PPMWriter<'a, TWrite: 'a> {
+    writer: &'a mut TWrite
 }
 
-impl<TWrite: io::Write> PPMWriter<TWrite> {
-    pub fn new(writer: TWrite) -> Self {
+impl<'a, TWrite: io::Write> PPMWriter<'a, TWrite> {
+    pub fn new(writer: &'a mut TWrite) -> Self {
         PPMWriter {
             writer: writer
         }
     }
 
-    pub fn write(&mut self, image_data: &[f32], width: u32, height: u32) -> io::Result<()> {
+    pub fn write(&mut self, image_data: &[f32], width: usize, height: usize) -> io::Result<()> {
         try!(self.write_magic_number());
         try!(self.write_metadata(width, height, 255));
 
@@ -24,7 +24,7 @@ impl<TWrite: io::Write> PPMWriter<TWrite> {
         write!(&mut self.writer, "P3\n")
     }
 
-    fn write_metadata(&mut self, width: u32, height: u32, max_pixel_val: u32) -> io::Result<()> {
+    fn write_metadata(&mut self, width: usize, height: usize, max_pixel_val: u32) -> io::Result<()> {
         write!(&mut self.writer, "{} {}\n{}\n", width, height, max_pixel_val)
     }
 
@@ -34,9 +34,7 @@ impl<TWrite: io::Write> PPMWriter<TWrite> {
             let g = (255.0 * pixel[1]) as u8;
             let b = (255.0 * pixel[2]) as u8;
 
-            try!(self.writer.write_all(&[r]));
-            try!(self.writer.write_all(&[g]));
-            try!(self.writer.write_all(&[b]));
+            try!(write!(self.writer, "{} {} {} ", r, g, b));
         }
 
         Ok(())

@@ -1,7 +1,7 @@
 use std::ops;
 
 /// A four-dimensional homogenous Vector. (4xf32)
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct Vector4 {
     pub x: f32,
     pub y: f32,
@@ -59,6 +59,10 @@ impl Vector4 {
         self.y * self.y +
         self.z * self.z +
         self.w * self.w
+    }
+
+    pub fn unit_vector(&self) -> Self {
+        self.clone() / self.length()
     }
 }
 

@@ -4,4 +4,5 @@ version = "0.1.0"
 authors = ["Sam Giles <sam.e.giles@gmail.com>"]
 
 [dependencies]
-ppm = { path="components/ppm" }
+ppm = { path = "components/ppm" }
+vector = { path = "components/vector" }

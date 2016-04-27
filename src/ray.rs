@@ -13,8 +13,15 @@ pub struct Ray {
 
 impl Ray {
 
+    pub fn new(origin: Vector4, direction: Vector4) -> Self {
+        Ray {
+            origin: origin,
+            direction: direction
+        }
+    }
+
     pub fn point_at_distance(&self, distance: f32) -> Vector4 {
-        self.origin + (distance * self.direction)
+        self.origin + (self.direction * distance)
     }
 
     pub fn origin(&self) -> Vector4 {

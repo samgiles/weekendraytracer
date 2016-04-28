@@ -54,6 +54,51 @@ impl Material for Metal {
     }
 }
 
+pub struct Dielectric {
+    refractive_index: f32,
+}
+
+impl Dielectric {
+    pub fn new(refractive_index: f32) -> Self {
+        Dielectric {
+            refractive_index: refractive_index,
+        }
+    }
+}
+
+impl Material for Dielectric {
+    fn scatter(&self, ray_in: &Ray, hit_record: &IntersectionRecord) -> Option<(Ray, Vector4)> {
+        let attenuation = Vector4::new3(1.0, 1.0, 0.0);
+        let (outward_normal, ratio) =
+            if hit_record.normal.dot3(ray_in.direction()) > 0.0 {
+                (-hit_record.normal, self.refractive_index)
+            } else {
+                let refractive_index_of_air = 1.0;
+                (hit_record.normal, refractive_index_of_air / self.refractive_index)
+            };
+
+        if let Some(refracted) = refract(ray_in.direction(), outward_normal, ratio) {
+            Some((Ray::new(hit_record.intersection_point, refracted), attenuation))
+        } else {
+            None
+            //let reflected = ray_in.direction().reflect(hit_record.normal);
+            //Some((Ray::new(hit_record.intersection_point, reflected), attenuation))
+        }
+    }
+}
+
+// http://math.stackexchange.com/questions/936936/deduction-of-vector-form-of-snells-law
+fn refract(vector_in: Vector4, normal: Vector4, ratio: f32) -> Option<Vector4> {
+    let cos_i = normal.dot3(vector_in);
+    let sin_t2 = ratio * ratio * (1.0 - cos_i * cos_i);
+
+    if sin_t2 > 1.0 {
+        None
+    } else {
+        Some(vector_in * ratio - (normal + (1.0 - sin_t2).sqrt()) * normal)
+    }
+}
+
 fn random_in_unit_sphere() -> Vector4 {
     loop {
         let p = (Vector4::new3(

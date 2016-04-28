@@ -7,6 +7,8 @@ I recommend it if you're looking to learn something new.
 For fun, this is a library with buildable examples for each chapter.  But,
 build your own using the book, it's well worth it.
 
+The examples are not backwards compatible with the Library.  That's too much
+work.
 
 # License
 

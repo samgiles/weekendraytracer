@@ -1,17 +1,21 @@
+use material::Material;
 use vector::Vector4;
 use ray::Ray;
 use renderable::{ IntersectionRecord, Renderable };
+use std::rc::Rc;
 
 pub struct Sphere {
     center: Vector4,
     radius: f32,
+    material: Rc<Box<Material>>,
 }
 
 impl Sphere {
-    pub fn new(center: Vector4, radius: f32) -> Self {
+    pub fn new<TMaterial: Material + 'static>(center: Vector4, radius: f32, material: TMaterial) -> Self {
         Sphere {
             center: center,
             radius: radius,
+            material: Rc::new(Box::new(material))
         }
     }
 }
@@ -38,7 +42,8 @@ impl Renderable for Sphere {
                 return Some(IntersectionRecord::new(
                         distance,
                         intersection_point,
-                        (intersection_point - self.center) / self.radius
+                        (intersection_point - self.center) / self.radius,
+                        self.material.clone(),
                     ));
             }
 
@@ -48,7 +53,8 @@ impl Renderable for Sphere {
                 return Some(IntersectionRecord::new(
                         distance,
                         intersection_point,
-                        (intersection_point - self.center) / self.radius
+                        (intersection_point - self.center) / self.radius,
+                        self.material.clone(),
                      ));
             }
         }

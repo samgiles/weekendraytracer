@@ -64,6 +64,10 @@ impl Vector4 {
     pub fn unit_vector(&self) -> Self {
         self.clone() / self.length()
     }
+
+    pub fn reflect(self, normal: Vector4) -> Self {
+        self - normal * (2.0 * self.dot3(normal))
+    }
 }
 
 impl ops::Mul<f32> for Vector4 {

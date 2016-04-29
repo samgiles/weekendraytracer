@@ -77,7 +77,7 @@ fn generate_image_data(width: usize, height: usize, anti_alias_sample_size: usiz
 fn colour(ray: &Ray, renderable_list: &[Box<Renderable>], depth: u32) -> Vector4 {
     if let Some(renderable_intersection) = renderable_list.intersects(ray, 0.001, std::f32::MAX) {
 
-        if depth < 50 {
+        if depth <= 50 {
             if let Some((scattered, attenuation)) = renderable_intersection.material.scatter(ray, &renderable_intersection) {
                 return attenuation * colour(&scattered, renderable_list, depth + 1);
             }

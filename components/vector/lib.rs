@@ -61,8 +61,8 @@ impl Vector4 {
         self.w * self.w
     }
 
-    pub fn unit_vector(&self) -> Self {
-        self.clone() / self.length()
+    pub fn unit_vector(self) -> Self {
+        self / self.length()
     }
 
     pub fn reflect(self, normal: Vector4) -> Self {

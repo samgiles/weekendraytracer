@@ -68,34 +68,49 @@ impl Dielectric {
 
 impl Material for Dielectric {
     fn scatter(&self, ray_in: &Ray, hit_record: &IntersectionRecord) -> Option<(Ray, Vector4)> {
-        let attenuation = Vector4::new3(1.0, 1.0, 0.0);
-        let (outward_normal, ratio) =
-            if hit_record.normal.dot3(ray_in.direction()) > 0.0 {
-                (-hit_record.normal, self.refractive_index)
+        let attenuation = Vector4::new3(1.0, 1.0, 1.0);
+        let cos_i = ray_in.direction().unit_vector().dot3(hit_record.normal);
+        let (outward_normal, ratio, cosine) =
+            if cos_i > 0.0 {
+                let cosine = self.refractive_index * cos_i / ray_in.direction().length();
+                (-hit_record.normal, self.refractive_index, cosine)
             } else {
-                let refractive_index_of_air = 1.0;
-                (hit_record.normal, refractive_index_of_air / self.refractive_index)
+                let cosine = -cos_i / ray_in.direction().length();
+                (hit_record.normal, 1.0 / self.refractive_index, cosine)
             };
 
-        if let Some(refracted) = refract(ray_in.direction(), outward_normal, ratio) {
-            Some((Ray::new(hit_record.intersection_point, refracted), attenuation))
+        let refract_result = refract(ray_in.direction(), outward_normal, ratio);
+
+        let reflect_probability = schlick(cosine, self.refractive_index);
+        if rand::random::<f32>() < reflect_probability {
+            let reflected = ray_in.direction().reflect(hit_record.normal);
+            Some((Ray::new(hit_record.intersection_point, reflected), attenuation))
         } else {
-            None
-            //let reflected = ray_in.direction().reflect(hit_record.normal);
-            //Some((Ray::new(hit_record.intersection_point, reflected), attenuation))
+            if let Some(refracted) = refract_result {
+                Some((Ray::new(hit_record.intersection_point, refracted), attenuation))
+            } else {
+                let reflected = ray_in.direction().reflect(hit_record.normal);
+                Some((Ray::new(hit_record.intersection_point, reflected), attenuation))
+            }
         }
     }
 }
 
+fn schlick(cosine: f32, refractive_index: f32) -> f32 {
+    let r0 = (1.0 - refractive_index) / (1.0 + refractive_index);
+    let r0 = r0 * r0;
+    r0 + (1.0 - r0) * (1.0 - cosine).powf(5.0)
+}
+
 // http://math.stackexchange.com/questions/936936/deduction-of-vector-form-of-snells-law
 fn refract(vector_in: Vector4, normal: Vector4, ratio: f32) -> Option<Vector4> {
-    let cos_i = normal.dot3(vector_in);
-    let sin_t2 = ratio * ratio * (1.0 - cos_i * cos_i);
+    let cos_i = vector_in.dot3(normal);
+    let sin_t2 = 1.0 - ratio * ratio * (1.0 - cos_i * cos_i);
 
-    if sin_t2 > 1.0 {
-        None
+    if sin_t2 > 0.0 {
+        Some((vector_in - (normal * cos_i)) * ratio - (normal * (sin_t2).sqrt()))
     } else {
-        Some(vector_in * ratio - (normal + (1.0 - sin_t2).sqrt()) * normal)
+        None
     }
 }
 

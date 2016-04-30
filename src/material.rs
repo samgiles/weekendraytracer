@@ -8,6 +8,7 @@ pub trait Material {
     fn scatter(&self, ray_in: &Ray, hit_record: &IntersectionRecord) -> Option<(Ray, Vector4)>;
 }
 
+#[derive(Clone)]
 pub struct Lambertian {
     albedo: Vector4,
 }
@@ -27,6 +28,7 @@ impl Material for Lambertian {
     }
 }
 
+#[derive(Clone)]
 pub struct Metal {
     albedo: Vector4,
     fuzz: f32,
@@ -54,6 +56,7 @@ impl Material for Metal {
     }
 }
 
+#[derive(Clone)]
 pub struct Dielectric {
     refractive_index: f32,
 }
